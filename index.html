@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>432 Hz AudioBook Creator</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>432 Hz AudioBook Creator v2.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -113,7 +116,7 @@
 
         header {
             text-align: center;
-            padding: 2rem 0 2rem;
+            padding: 1.5rem 0 1.5rem;
             position: relative;
         }
 
@@ -232,10 +235,10 @@
             to { opacity: 1; }
         }
 
-        /* FIXED SIZING - 432 Hz smaller */
+        /* FIXED SIZING - 432 Hz SMALLER */
         .logo {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem; /* REDUCED from 4.5rem */
+            font-size: 2.2rem;
             font-weight: 900;
             margin-bottom: 0.3rem;
             background: var(--gradient-cosmic);
@@ -266,25 +269,26 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* AUDIOBOOK CREATOR - Much BIGGER and MORE PROMINENT */
+        /* AUDIOBOOK CREATOR - MUCH BIGGER */
         .tagline {
-            font-family: 'Orbitron', sans-serif; /* Changed to Orbitron for impact */
-            font-size: 2.8rem; /* INCREASED from 1.4rem */
-            font-weight: 700; /* ADDED weight */
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
             color: var(--text-glow);
-            letter-spacing: 4px; /* INCREASED spacing */
-            opacity: 1; /* INCREASED from 0.9 */
-            margin-bottom: 1rem;
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5); /* ADDED glow */
+            letter-spacing: 3px;
+            opacity: 1;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            line-height: 1.2;
         }
 
         /* Subtitle - MORE VISIBLE */
         .subtitle {
-            font-size: 1.3rem; /* INCREASED from 1rem */
-            color: var(--text-bright); /* Changed to brighter white */
-            margin-top: 0.5rem;
-            opacity: 0.85; /* INCREASED from 0.7 */
-            font-weight: 400; /* INCREASED from 300 */
+            font-size: 1.2rem;
+            color: var(--text-bright);
+            margin-top: 0.3rem;
+            opacity: 0.85;
+            font-weight: 400;
             letter-spacing: 1px;
         }
 
@@ -292,7 +296,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            margin-top: 3rem;
+            margin-top: 2rem;
         }
 
         @media (max-width: 968px) {
@@ -300,18 +304,21 @@
                 grid-template-columns: 1fr;
             }
             
-            /* Mobile adjustments */
+            header {
+                padding: 1rem 0 1rem;
+            }
+            
             .logo {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
             
             .tagline {
-                font-size: 2.2rem;
+                font-size: 2rem;
                 letter-spacing: 2px;
             }
             
             .subtitle {
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
         }
 
@@ -740,7 +747,6 @@
             opacity: 0.7;
         }
 
-        /* Background Music Controls */
         .background-music-controls {
             margin-top: 1.5rem;
             padding: 1.5rem;
@@ -878,7 +884,6 @@
     </style>
 </head>
 <body>
-    <!-- BLACK SCREEN LISTENING MODE -->
     <div class="black-screen-overlay" id="blackScreenOverlay">
         <button class="exit-black-screen" onclick="exitBlackScreen()" title="Exit (ESC)">✕</button>
         
@@ -904,7 +909,6 @@
         </header>
 
         <div class="main-grid">
-            <!-- LEFT COLUMN: INPUT -->
             <div class="card">
                 <h2><span class="icon">📝</span> Your Text</h2>
                 
@@ -941,7 +945,6 @@ Or paste any spiritual text, affirmations, mantras, or stories you wish to hear 
                     </div>
                 </div>
 
-                <!-- BACKGROUND MUSIC CONTROLS -->
                 <div class="background-music-controls">
                     <div class="music-title">🎵 Background Music (Optional)</div>
                     <div class="music-options">
@@ -974,7 +977,6 @@ Or paste any spiritual text, affirmations, mantras, or stories you wish to hear 
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: SETTINGS -->
             <div class="card">
                 <h2><span class="icon">🎵</span> Frequency Selection</h2>
                 
@@ -1013,7 +1015,6 @@ Or paste any spiritual text, affirmations, mantras, or stories you wish to hear 
                     </div>
                 </div>
 
-                <!-- USAGE STATS -->
                 <div class="usage-stats">
                     <div class="usage-title">📊 Free Tier Usage</div>
                     <div class="stat-row">
@@ -1035,7 +1036,6 @@ Or paste any spiritual text, affirmations, mantras, or stories you wish to hear 
             </div>
         </div>
 
-        <!-- AUDIO PLAYER -->
         <div class="audio-player" id="audioPlayer">
             <h2><span class="icon">🎧</span> Audio Player</h2>
             
@@ -1083,7 +1083,6 @@ Or paste any spiritual text, affirmations, mantras, or stories you wish to hear 
         </footer>
     </div>
 
-    <!-- UPGRADE MODAL -->
     <div class="upgrade-modal" id="upgradeModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeUpgradeModal()">×</button>
@@ -1113,7 +1112,6 @@ Or paste any spiritual text, affirmations, mantras, or stories you wish to hear 
     </div>
 
     <script>
-        // [SAME JAVASCRIPT AS BEFORE - FULLY FUNCTIONAL]
         let appState = {
             selectedFrequency: 432,
             selectedBackgroundMusic: 'off',
