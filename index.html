@@ -1,788 +1,643 @@
-        header {
-            text-align: center;
-            padding: 1.5rem 0 1.5rem;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- CACHE BUSTING -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="version" content="8.0">
+    
+    <title>432 Hz AudioBook Creator v8.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --turquoise: #00FFFF;
+            --gold: #FFD700;
+            --white: #FFFFFF;
+        }
+
+        /* UNIVERSE BACKGROUND */
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #000428 0%, #004e92 50%, #001a33 100%);
+            color: var(--white);
+            min-height: 100vh;
             position: relative;
         }
 
-        /* BLACK SCREEN LISTENING MODE */
-        .black-screen-overlay {
-            display: none;
+        body::before {
+            content: '';
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000000;
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            cursor: pointer;
-        }
-
-        .black-screen-overlay.active {
-            display: flex;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .black-screen-content {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .black-screen-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            color: #FFFFFF;
-            margin-bottom: 1rem;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(0, 206, 209, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(32, 178, 170, 0.15) 0%, transparent 50%),
+                radial-gradient(2px 2px at 10% 20%, white, transparent),
+                radial-gradient(1px 1px at 90% 80%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, rgba(255,255,255,0.5), transparent);
+            background-size: 100% 100%, 100% 100%, 200px 200px, 150px 150px, 100px 100px;
             opacity: 0.9;
+            z-index: 0;
         }
 
-        .black-screen-info {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.2rem;
-            color: #AAAAAA;
-            margin-bottom: 2rem;
-            opacity: 0.7;
-        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; position: relative; z-index: 1; }
 
-        .black-screen-controls {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            margin-top: 2rem;
-        }
+        /* HEADER - EQUAL SPACING */
+        header { text-align: center; padding: 1rem 0 0rem; margin-bottom: 2rem; }
 
-        .black-screen-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            color: #FFFFFF;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .black-screen-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: scale(1.1);
-        }
-
-        .exit-black-screen {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            color: #FFFFFF;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .exit-black-screen:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: scale(1.1);
-        }
-
-        .tap-hint {
-            position: absolute;
-            bottom: 3rem;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'Rajdhani', sans-serif;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.9rem;
-            animation: fadeInOut 3s ease-in-out infinite;
-        }
-
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.6; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* FIXED SIZING - 432 Hz SMALLER */
         .logo {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.2rem;
+            font-size: 3rem;
             font-weight: 900;
-            margin-bottom: 0.3rem;
-            background: var(--gradient-cosmic);
+            background: linear-gradient(135deg, #00CED1 0%, #1E90FF 33%, #FFD700 66%, #00FF88 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: cosmicShift 4s ease-in-out infinite;
-            position: relative;
+            background-size: 300% auto;
+            animation: gentleShimmer 8s ease-in-out infinite;
+            margin-bottom: 0.5rem;
         }
 
-        @keyframes cosmicShift {
+        @keyframes gentleShimmer {
             0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
         }
 
-        .logo::before {
-            content: '432 Hz';
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            filter: blur(20px);
-            opacity: 0.5;
-            background: var(--gradient-cosmic);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* AUDIOBOOK CREATOR - MUCH BIGGER */
         .tagline {
             font-family: 'Orbitron', sans-serif;
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--text-glow);
+            color: var(--white);
             letter-spacing: 3px;
-            opacity: 1;
-            margin-bottom: 0.8rem;
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-            line-height: 1.2;
-        }
-
-        /* Subtitle - MORE VISIBLE */
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-bright);
-            margin-top: 0.3rem;
-            opacity: 0.85;
-            font-weight: 400;
-            letter-spacing: 1px;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        @media (max-width: 968px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            header {
-                padding: 1rem 0 1rem;
-            }
-            
-            .logo {
-                font-size: 1.8rem;
-            }
-            
-            .tagline {
-                font-size: 2rem;
-                letter-spacing: 2px;
-            }
-            
-            .subtitle {
-                font-size: 1rem;
-            }
-        }
-
-        .card {
-            background: rgba(22, 33, 62, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 2rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 0 30px rgba(0, 255, 255, 0.15),
-                inset 0 0 40px rgba(139, 92, 246, 0.05);
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient-turquoise);
-        }
-
-        h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            color: var(--turquoise);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        h2 .icon {
-            font-size: 1.4rem;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
             margin-bottom: 0.5rem;
-            color: var(--text-glow);
-            font-weight: 500;
-            font-size: 1rem;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
 
-        textarea {
-            width: 100%;
-            min-height: 300px;
-            background: rgba(10, 1, 24, 0.6);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 1rem;
-            color: var(--text-bright);
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.1rem;
-            resize: vertical;
-            transition: all 0.3s ease;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--turquoise);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .char-counter {
-            text-align: right;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--silver);
-        }
-
-        .char-counter.warning {
-            color: var(--orange);
-        }
-
-        .char-counter.limit {
-            color: #FF4444;
-        }
-
-        select {
-            width: 100%;
-            background: rgba(10, 1, 24, 0.6);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 0.8rem 1rem;
-            color: var(--text-bright);
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: var(--turquoise);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-        }
-
-        option {
-            background: var(--bg-deep);
-            color: var(--text-bright);
-        }
-
-        .frequency-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .freq-option {
-            background: rgba(10, 1, 24, 0.6);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 1rem;
+        /* SUBTITLE - LARGER, GOLD, EQUAL SPACING */
+        .subtitle { 
+            font-size: 1.3rem;
+            color: #FFD700;
+            opacity: 0.9;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
+            margin: 0 auto;
+            max-width: 90%;
         }
 
-        .freq-option:hover {
-            border-color: var(--turquoise);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
+        .text-card { 
+            background: rgba(22, 33, 62, 0.7); 
+            border: 3px solid var(--turquoise); 
+            border-radius: 20px; 
+            padding: 2rem; 
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
         }
 
-        .freq-option.selected {
-            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(139, 92, 246, 0.2));
-            border-color: var(--turquoise);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-        }
-
-        .freq-number {
+        .section-title {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.5rem;
             color: var(--turquoise);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: var(--white);
             font-weight: 700;
+            font-size: 1.3rem;
+            text-align: center;
+            text-transform: uppercase;
         }
 
-        .freq-name {
-            font-size: 0.9rem;
-            color: var(--silver);
-            margin-top: 0.3rem;
-        }
-
-        .btn {
-            background: var(--gradient-turquoise);
-            border: none;
+        /* TEXT AREA - CENTERED IN FRAME */
+        textarea {
+            width: 100%;
+            min-height: 280px;
+            background: rgba(10, 1, 24, 0.8);
+            border: 2px solid rgba(0, 255, 255, 0.4);
             border-radius: 12px;
-            padding: 1rem 2rem;
-            color: var(--bg-deep);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
+            padding: 1rem;
+            color: var(--white);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.05rem;
+            resize: vertical;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .char-counter { 
+            text-align: center; 
+            margin-top: 0.5rem; 
+            font-size: 0.95rem; 
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* UPLOAD - ATTRACTIVE TEAL/TURQUOISE (NO GRAY) */
+        .upload-section {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, rgba(0, 206, 209, 0.3), rgba(64, 224, 208, 0.3));
+            border: 3px dashed rgba(0, 255, 255, 0.6);
+            border-radius: 15px;
+            padding: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            display: inline-block;
+            width: 100%;
+            max-width: 500px;
         }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .btn:hover {
+        .upload-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 206, 209, 0.5), rgba(64, 224, 208, 0.5));
+            border-color: var(--turquoise);
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
+        .upload-icon { font-size: 2.5rem; margin-bottom: 0.3rem; }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(0, 255, 255, 0.3));
-            border: 2px solid rgba(139, 92, 246, 0.5);
-            color: var(--text-bright);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .audio-player {
-            background: rgba(10, 1, 24, 0.8);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-top: 2rem;
-            display: none;
-        }
-
-        .audio-player.active {
-            display: block;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .waveform {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            height: 100px;
-            margin: 2rem 0;
-        }
-
-        .wave-bar {
-            width: 8px;
-            background: var(--gradient-turquoise);
-            border-radius: 4px;
-            animation: wave 1s ease-in-out infinite;
-        }
-
-        .wave-bar:nth-child(1) { animation-delay: 0s; }
-        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
-        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
-        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
-        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
-        .wave-bar:nth-child(6) { animation-delay: 0.3s; }
-        .wave-bar:nth-child(7) { animation-delay: 0.2s; }
-        .wave-bar:nth-child(8) { animation-delay: 0.1s; }
-
-        @keyframes wave {
-            0%, 100% { height: 20px; }
-            50% { height: 80px; }
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .control-btn {
-            background: rgba(0, 255, 255, 0.2);
-            border: 2px solid var(--turquoise);
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            color: var(--turquoise);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .control-btn:hover {
-            background: rgba(0, 255, 255, 0.3);
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .info-item {
-            background: rgba(0, 255, 255, 0.1);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .info-label {
-            font-size: 0.85rem;
-            color: var(--silver);
-            margin-bottom: 0.5rem;
-        }
-
-        .info-value {
+        .upload-text {
             font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--white);
+            text-transform: uppercase;
+        }
+
+        .voice-label {
+            display: block;
+            margin: 1.5rem 0 0.8rem 0;
+            color: var(--white);
+            font-weight: 700;
             font-size: 1.3rem;
-            color: var(--turquoise);
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        select {
+            width: 100%;
+            background: rgba(10, 1, 24, 0.8);
+            border: 2px solid rgba(0, 255, 255, 0.4);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            color: var(--white);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
             font-weight: 700;
         }
 
-        #currentFreq {
-            background: var(--gradient-turquoise);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        option {
+            background: #0A0118;
+            color: var(--white);
+            font-weight: 700;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
-        .usage-stats {
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .usage-title {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--purple);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-        }
-
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-
-        .upgrade-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .upgrade-modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border: 2px solid var(--turquoise);
+        /* FREQUENCY SELECTION */
+        .frequency-card {
+            background: rgba(22, 33, 62, 0.7);
+            border: 3px solid var(--turquoise);
             border-radius: 20px;
-            padding: 3rem;
-            max-width: 600px;
-            text-align: center;
-            position: relative;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: var(--text-bright);
-            font-size: 2rem;
-            cursor: pointer;
-        }
-
-        .features-list {
-            text-align: left;
-            margin: 2rem 0;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0;
-            color: var(--text-glow);
-        }
-
-        .feature-item::before {
-            content: '✨';
-        }
-
-        .price {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            color: var(--gold);
-            margin: 1rem 0;
-        }
-
-        footer {
-            text-align: center;
-            padding: 3rem 0 2rem;
-            color: var(--silver);
-            opacity: 0.7;
-        }
-
-        .background-music-controls {
-            margin-top: 1.5rem;
             padding: 1.5rem;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .frequency-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--turquoise);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .frequency-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* FREQUENCY BUTTONS - STAY HIGHLIGHTED */
+        .freq-option {
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 432 Hz - BLUE */
+        .freq-option[data-freq="432"] {
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.3), rgba(0, 123, 255, 0.3));
+        }
+        .freq-option[data-freq="432"]:hover {
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.5), rgba(0, 123, 255, 0.5));
+        }
+        .freq-option[data-freq="432"].selected {
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.8), rgba(0, 123, 255, 0.8));
+            border: 3px solid #1E90FF;
+            box-shadow: 0 0 30px rgba(30, 144, 255, 0.8), inset 0 0 20px rgba(30, 144, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* 528 Hz - GREEN */
+        .freq-option[data-freq="528"] {
+            background: linear-gradient(135deg, rgba(0, 255, 127, 0.3), rgba(34, 139, 34, 0.3));
+        }
+        .freq-option[data-freq="528"]:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 127, 0.5), rgba(34, 139, 34, 0.5));
+        }
+        .freq-option[data-freq="528"].selected {
+            background: linear-gradient(135deg, rgba(0, 255, 127, 0.8), rgba(34, 139, 34, 0.8));
+            border: 3px solid #00FF7F;
+            box-shadow: 0 0 30px rgba(0, 255, 127, 0.8), inset 0 0 20px rgba(0, 255, 127, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* 396 Hz - PURPLE */
+        .freq-option[data-freq="396"] {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(75, 0, 130, 0.3));
+        }
+        .freq-option[data-freq="396"]:hover {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.5), rgba(75, 0, 130, 0.5));
+        }
+        .freq-option[data-freq="396"].selected {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.8), rgba(75, 0, 130, 0.8));
+            border: 3px solid #8A2BE2;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.8), inset 0 0 20px rgba(138, 43, 226, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* 639 Hz - ORANGE */
+        .freq-option[data-freq="639"] {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.3), rgba(255, 69, 0, 0.3));
+        }
+        .freq-option[data-freq="639"]:hover {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.5), rgba(255, 69, 0, 0.5));
+        }
+        .freq-option[data-freq="639"].selected {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.8), rgba(255, 69, 0, 0.8));
+            border: 3px solid #FF8C00;
+            box-shadow: 0 0 30px rgba(255, 140, 0, 0.8), inset 0 0 20px rgba(255, 140, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .freq-number { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 1.5rem; 
+            color: var(--white); 
+            font-weight: 900;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .freq-name { 
+            font-size: 0.9rem; 
+            color: var(--white); 
+            margin-top: 0.3rem;
+            font-weight: 600;
+        }
+
+        /* BACKGROUND MUSIC */
+        .music-card {
+            background: rgba(22, 33, 62, 0.7);
+            border: 3px solid var(--turquoise);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
         }
 
         .music-title {
             font-family: 'Orbitron', sans-serif;
-            color: var(--purple);
+            color: var(--turquoise);
             margin-bottom: 1rem;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-align: center;
         }
 
-        .music-options {
+        .music-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
-            margin-top: 1rem;
+            max-width: 450px;
+            margin: 0 auto;
         }
 
+        /* MUSIC BUTTONS - STAY HIGHLIGHTED */
         .music-option {
-            background: rgba(10, 1, 24, 0.6);
-            border: 2px solid rgba(139, 92, 246, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             padding: 1rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .music-option:hover {
-            border-color: var(--purple);
+        /* OFF - SOFT BLUE */
+        .music-option[data-music="off"] {
+            background: linear-gradient(135deg, rgba(70, 130, 180, 0.3), rgba(100, 149, 237, 0.3));
+        }
+        .music-option[data-music="off"]:hover {
+            background: linear-gradient(135deg, rgba(70, 130, 180, 0.5), rgba(100, 149, 237, 0.5));
+        }
+        .music-option[data-music="off"].selected {
+            background: linear-gradient(135deg, rgba(70, 130, 180, 0.8), rgba(100, 149, 237, 0.8));
+            border: 3px solid #4682B4;
+            box-shadow: 0 0 30px rgba(70, 130, 180, 0.8), inset 0 0 20px rgba(70, 130, 180, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* SUN - ORANGE/YELLOW */
+        .music-option[data-music="sun"] {
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.3), rgba(255, 215, 0, 0.3));
+        }
+        .music-option[data-music="sun"]:hover {
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.5), rgba(255, 215, 0, 0.5));
+        }
+        .music-option[data-music="sun"].selected {
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.8), rgba(255, 215, 0, 0.8));
+            border: 3px solid #FFA500;
+            box-shadow: 0 0 30px rgba(255, 165, 0, 0.8), inset 0 0 20px rgba(255, 165, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* RUMI - PURPLE */
+        .music-option[data-music="rumi"] {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(147, 112, 219, 0.3));
+        }
+        .music-option[data-music="rumi"]:hover {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.5), rgba(147, 112, 219, 0.5));
+        }
+        .music-option[data-music="rumi"].selected {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.8), rgba(147, 112, 219, 0.8));
+            border: 3px solid #8A2BE2;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.8), inset 0 0 20px rgba(138, 43, 226, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* NATURE - GREEN */
+        .music-option[data-music="nature"] {
+            background: linear-gradient(135deg, rgba(34, 139, 34, 0.3), rgba(0, 128, 0, 0.3));
+        }
+        .music-option[data-music="nature"]:hover {
+            background: linear-gradient(135deg, rgba(34, 139, 34, 0.5), rgba(0, 128, 0, 0.5));
+        }
+        .music-option[data-music="nature"].selected {
+            background: linear-gradient(135deg, rgba(34, 139, 34, 0.8), rgba(0, 128, 0, 0.8));
+            border: 3px solid #228B22;
+            box-shadow: 0 0 30px rgba(34, 139, 34, 0.8), inset 0 0 20px rgba(34, 139, 34, 0.3);
+            transform: scale(1.05);
+        }
+
+        .music-icon { 
+            font-size: 2rem; 
+            margin-bottom: 0.3rem;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+
+        .music-name { 
+            font-size: 0.9rem; 
+            color: var(--white); 
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+
+        .btn {
+            background: linear-gradient(135deg, #20B2AA, #008B8B);
+            border: none;
+            border-radius: 15px;
+            padding: 1.2rem 1.5rem;
+            color: var(--white);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 8px 30px rgba(32, 178, 170, 0.5);
         }
 
-        .music-option.selected {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(255, 215, 0, 0.2));
-            border-color: var(--purple);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        /* SAVE BUTTON - WHITE BOLD TEXT */
+        .btn-save {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #FFFFFF;
+            font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
-        .music-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+        .btn-save:hover {
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
         }
 
-        .music-name {
-            font-size: 0.9rem;
-            color: var(--text-glow);
-            font-weight: 500;
+        .speed-card {
+            background: rgba(22, 33, 62, 0.7);
+            border: 3px solid var(--turquoise);
+            border-radius: 20px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
         }
 
-        .volume-control {
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .volume-control.active {
+        .speed-label {
             display: block;
+            margin-bottom: 0.8rem;
+            color: var(--turquoise);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+            text-transform: uppercase;
         }
 
-        .volume-slider {
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 8px;
-            border-radius: 5px;
-            background: rgba(139, 92, 246, 0.3);
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--purple);
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--purple);
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
-        }
-
-        .speed-control {
-            margin-top: 1.5rem;
-        }
-
-        .speed-buttons {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
+        .speed-buttons { display: flex; gap: 0.5rem; justify-content: center; }
 
         .speed-btn {
             flex: 1;
-            background: rgba(0, 255, 255, 0.1);
-            border: 2px solid rgba(0, 255, 255, 0.3);
+            background: rgba(0, 139, 139, 0.3);
+            border: 2px solid rgba(0, 255, 255, 0.4);
             border-radius: 8px;
-            padding: 0.5rem;
-            color: var(--text-bright);
+            padding: 0.6rem;
+            color: var(--white);
             font-family: 'Rajdhani', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .speed-btn:hover {
+            background: rgba(0, 139, 139, 0.5);
             border-color: var(--turquoise);
-            background: rgba(0, 255, 255, 0.2);
         }
 
+        /* SPEECH SPEED - CONSISTENT HIGHLIGHTING */
         .speed-btn.active {
-            background: rgba(0, 255, 255, 0.3);
-            border-color: var(--turquoise);
-            font-weight: 700;
+            background: linear-gradient(135deg, rgba(0, 206, 209, 0.8), rgba(32, 178, 170, 0.8));
+            border: 3px solid var(--turquoise);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), inset 0 0 15px rgba(0, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* USAGE DASHBOARD */
+        .usage-card {
+            background: rgba(22, 33, 62, 0.7);
+            border: 3px solid var(--turquoise);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .usage-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--turquoise);
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .usage-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #FFD700;
+            margin: 0.5rem 0;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .usage-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.3rem;
+        }
+
+        .premium-section {
+            text-align: center;
+            margin: 3rem 0 2rem 0;
+        }
+
+        .premium-btn {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 25px;
+            padding: 1.2rem 3rem;
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+
+        .premium-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.7);
+        }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: linear-gradient(135deg, #001a33, #004e92);
+            border: 3px solid var(--gold);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--white); font-size: 2rem; cursor: pointer; }
+        .modal-title { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: var(--gold); text-align: center; margin-bottom: 2rem; }
+        .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .plan-card { background: rgba(0, 0, 0, 0.5); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 15px; padding: 2rem; text-align: center; }
+        .plan-card.premium { border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); }
+        .plan-name { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: var(--turquoise); margin-bottom: 1rem; }
+        .plan-card.premium .plan-name { color: var(--gold); }
+        .plan-price { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: var(--white); margin: 1rem 0; }
+        .plan-features { list-style: none; text-align: left; margin: 1.5rem 0; }
+        .plan-features li { padding: 0.5rem 0; color: var(--white); }
+        .plan-features li::before { content: '✓ '; color: #00FF88; font-weight: 700; margin-right: 0.5rem; }
+        .plan-btn { background: linear-gradient(135deg, #20B2AA, #008B8B); border: none; border-radius: 12px; padding: 1rem 2rem; color: var(--white); font-family: 'Orbitron', sans-serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; width: 100%; margin-top: 1rem; }
+        .plan-card.premium .plan-btn { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+
+        footer { text-align: center; padding: 2rem 0; color: rgba(255,255,255,0.7); }
+
+        @media (max-width: 768px) {
+            .logo { font-size: 2.2rem; }
+            .tagline { font-size: 2rem; }
+            .subtitle { font-size: 1.1rem; }
+            .btn-group { grid-template-columns: 1fr; }
+            .plans-grid { grid-template-columns: 1fr; }
+            .premium-btn { font-size: 1.1rem; padding: 1rem 2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="black-screen-overlay" id="blackScreenOverlay">
-        <button class="exit-black-screen" onclick="exitBlackScreen()" title="Exit (ESC)">✕</button>
-        
-        <div class="black-screen-content">
-            <div class="black-screen-title">🎧 Listening Mode</div>
-            <div class="black-screen-info" id="blackScreenFreq">432 Hz</div>
-            
-            <div class="black-screen-controls">
-                <button class="black-screen-btn" onclick="playAudio()" title="Play">▶</button>
-                <button class="black-screen-btn" onclick="pauseAudio()" title="Pause">⏸</button>
-                <button class="black-screen-btn" onclick="stopAudio()" title="Stop">⏹</button>
+    <div class="modal-overlay" id="premiumModal" onclick="if(event.target === this) closePremiumModal()">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePremiumModal()">×</button>
+            <h2 class="modal-title">Choose Your Plan</h2>
+            <div class="plans-grid">
+                <div class="plan-card">
+                    <div class="plan-name">FREE</div>
+                    <div class="plan-price">$0<span style="font-size: 1.2rem;">/mo</span></div>
+                    <ul class="plan-features">
+                        <li>5,000 characters</li>
+                        <li>5 conversions/day</li>
+                        <li>8 frequencies</li>
+                        <li>3 background music</li>
+                        <li>Online playback</li>
+                    </ul>
+                    <button class="plan-btn" onclick="closePremiumModal()">Current Plan</button>
+                </div>
+                <div class="plan-card premium">
+                    <div class="plan-name">💎 PREMIUM</div>
+                    <div class="plan-price">$9.99<span style="font-size: 1.2rem;">/mo</span></div>
+                    <ul class="plan-features">
+                        <li>50,000 characters</li>
+                        <li>Unlimited conversions</li>
+                        <li>MP3 download</li>
+                        <li>Premium voices</li>
+                        <li>10+ music options</li>
+                        <li>Cloud storage</li>
+                    </ul>
+                    <button class="plan-btn" onclick="alert('Coming soon!')">Upgrade Now</button>
+                </div>
             </div>
         </div>
-        
-        <div class="tap-hint">Press ESC or tap ✕ to exit</div>
     </div>
 
     <div class="container">
@@ -792,640 +647,253 @@
             <p class="subtitle">Transform Text into Healing Sound Frequencies</p>
         </header>
 
-        <div class="main-grid">
-            <div class="card">
-                <h2><span class="icon">📝</span> Your Text</h2>
-                
-                <div class="input-group">
-                    <label for="textInput">Paste or type your text below</label>
-                    <textarea 
-                        id="textInput" 
-                        placeholder="Enter the text you want to convert into a healing audiobook...
+        <div class="text-card">
+            <h2 class="section-title">Your Text</h2>
+            <label class="input-label">Paste or Type Your Text Below</label>
+            <textarea id="textInput" placeholder="Enter your text here..." oninput="updateCharCounter()"></textarea>
+            <div class="char-counter" id="charCounter">0 / 50,000 characters</div>
 
-Example:
-In the beginning was the Word, and the Word was with God, and the Word was God.
-
-Or paste any spiritual text, affirmations, mantras, or stories you wish to hear in sacred frequency..."
-                        oninput="updateCharCounter()"
-                    ></textarea>
-                    <div class="char-counter" id="charCounter">0 / 5,000 characters</div>
+            <div class="upload-section">
+                <div class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-text">Upload Text File</div>
                 </div>
-
-                <div class="input-group">
-                    <label for="voiceSelect">Select Voice</label>
-                    <select id="voiceSelect">
-                        <option value="">Loading voices...</option>
-                    </select>
-                </div>
-
-                <div class="speed-control">
-                    <label>Speech Speed</label>
-                    <div class="speed-buttons">
-                        <button class="speed-btn" onclick="setSpeed(0.75)">0.75x</button>
-                        <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
-                        <button class="speed-btn" onclick="setSpeed(1.25)">1.25x</button>
-                        <button class="speed-btn" onclick="setSpeed(1.5)">1.5x</button>
-                        <button class="speed-btn" onclick="setSpeed(2)">2x</button>
-                    </div>
-                </div>
-
-                <div class="background-music-controls">
-                    <div class="music-title">🎵 Background Music (Optional)</div>
-                    <div class="music-options">
-                        <div class="music-option selected" data-music="off" onclick="selectBackgroundMusic('off')">
-                            <div class="music-icon">🔇</div>
-                            <div class="music-name">Off</div>
-                        </div>
-                        <div class="music-option" data-music="sun" onclick="selectBackgroundMusic('sun')">
-                            <div class="music-icon">☀️</div>
-                            <div class="music-name">Sun Salutation</div>
-                        </div>
-                        <div class="music-option" data-music="rumi" onclick="selectBackgroundMusic('rumi')">
-                            <div class="music-icon">🌙</div>
-                            <div class="music-name">Rumi Dreams</div>
-                        </div>
-                    </div>
-                    
-                    <div class="volume-control" id="volumeControl">
-                        <label>Music Volume</label>
-                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30" oninput="updateVolume(this.value)">
-                        <div style="text-align: center; margin-top: 0.5rem; color: var(--silver); font-size: 0.9rem;">
-                            <span id="volumeValue">30</span>%
-                        </div>
-                    </div>
-                </div>
-
-                <div class="btn-group">
-                    <button class="btn" onclick="generateAudio()">🎧 Generate Audio</button>
-                    <button class="btn btn-secondary" onclick="saveProject()">💾 Save Project</button>
-                </div>
+                <input type="file" id="fileInput" accept=".txt" style="display: none;" onchange="handleFileUpload(event)">
             </div>
 
-            <div class="card">
-                <h2><span class="icon">🎵</span> Frequency Selection</h2>
-                
-                <div class="frequency-selector">
-                    <div class="freq-option" onclick="selectFrequency(396)">
-                        <div class="freq-number">396 Hz</div>
-                        <div class="freq-name">Liberation</div>
-                    </div>
-                    <div class="freq-option" onclick="selectFrequency(417)">
-                        <div class="freq-number">417 Hz</div>
-                        <div class="freq-name">Change</div>
-                    </div>
-                    <div class="freq-option selected" onclick="selectFrequency(432)">
-                        <div class="freq-number">432 Hz</div>
-                        <div class="freq-name">Universal</div>
-                    </div>
-                    <div class="freq-option" onclick="selectFrequency(528)">
-                        <div class="freq-number">528 Hz</div>
-                        <div class="freq-name">Love</div>
-                    </div>
-                    <div class="freq-option" onclick="selectFrequency(639)">
-                        <div class="freq-number">639 Hz</div>
-                        <div class="freq-name">Connection</div>
-                    </div>
-                    <div class="freq-option" onclick="selectFrequency(741)">
-                        <div class="freq-number">741 Hz</div>
-                        <div class="freq-name">Expression</div>
-                    </div>
-                    <div class="freq-option" onclick="selectFrequency(852)">
-                        <div class="freq-number">852 Hz</div>
-                        <div class="freq-name">Intuition</div>
-                    </div>
-                    <div class="freq-option" onclick="selectFrequency(963)">
-                        <div class="freq-number">963 Hz</div>
-                        <div class="freq-name">Divine</div>
-                    </div>
-                </div>
+            <label class="voice-label">Select Voice</label>
+            <select id="voiceSelect"><option>Loading voices...</option></select>
+        </div>
 
-                <div class="usage-stats">
-                    <div class="usage-title">📊 Free Tier Usage</div>
-                    <div class="stat-row">
-                        <span>Conversions Today:</span>
-                        <span id="conversionsUsed">0</span> / <span id="conversionsLimit">5</span>
-                    </div>
-                    <div class="stat-row">
-                        <span>Character Limit:</span>
-                        <span id="charLimit">5,000</span>
-                    </div>
-                    <div class="stat-row">
-                        <span>Conversions Remaining:</span>
-                        <span id="conversionsRemaining">5</span>
-                    </div>
-                    <button class="btn" style="margin-top: 1rem; width: 100%;" onclick="showUpgradeModal()">
-                        ⚡ Upgrade to Pro
-                    </button>
+        <div class="frequency-card">
+            <h2 class="frequency-title">Frequency Selection</h2>
+            <div class="frequency-grid">
+                <div class="freq-option selected" data-freq="432" onclick="selectFrequency(432, this)">
+                    <div class="freq-number">432 Hz</div>
+                    <div class="freq-name">Natural</div>
+                </div>
+                <div class="freq-option" data-freq="528" onclick="selectFrequency(528, this)">
+                    <div class="freq-number">528 Hz</div>
+                    <div class="freq-name">Love</div>
+                </div>
+                <div class="freq-option" data-freq="396" onclick="selectFrequency(396, this)">
+                    <div class="freq-number">396 Hz</div>
+                    <div class="freq-name">Liberation</div>
+                </div>
+                <div class="freq-option" data-freq="639" onclick="selectFrequency(639, this)">
+                    <div class="freq-number">639 Hz</div>
+                    <div class="freq-name">Connection</div>
                 </div>
             </div>
         </div>
 
-        <div class="audio-player" id="audioPlayer">
-            <h2><span class="icon">🎧</span> Audio Player</h2>
-            
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">Current Frequency</div>
-                    <div class="info-value" id="currentFreq">432 Hz</div>
+        <div class="music-card">
+            <div class="music-title">Background Music</div>
+            <div class="music-grid">
+                <div class="music-option selected" data-music="off" onclick="selectBackgroundMusic('off', this)">
+                    <div class="music-icon">🔇</div>
+                    <div class="music-name">Off</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Duration</div>
-                    <div class="info-value" id="audioDuration">0:00</div>
+                <div class="music-option" data-music="sun" onclick="selectBackgroundMusic('sun', this)">
+                    <div class="music-icon">☀️</div>
+                    <div class="music-name">Sun</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Words</div>
-                    <div class="info-value" id="wordCount">0</div>
+                <div class="music-option" data-music="rumi" onclick="selectBackgroundMusic('rumi', this)">
+                    <div class="music-icon">🌙</div>
+                    <div class="music-name">Rumi</div>
+                </div>
+                <div class="music-option" data-music="nature" onclick="selectBackgroundMusic('nature', this)">
+                    <div class="music-icon">🌿</div>
+                    <div class="music-name">Nature</div>
                 </div>
             </div>
+        </div>
 
-            <div class="waveform">
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
+        <div class="speed-card">
+            <div class="speed-label">Speech Speed</div>
+            <div class="speed-buttons">
+                <button class="speed-btn" onclick="setSpeed(0.75, this)">0.75x</button>
+                <button class="speed-btn active" onclick="setSpeed(1, this)">1x</button>
+                <button class="speed-btn" onclick="setSpeed(1.25, this)">1.25x</button>
+                <button class="speed-btn" onclick="setSpeed(1.5, this)">1.5x</button>
+                <button class="speed-btn" onclick="setSpeed(2, this)">2x</button>
             </div>
+        </div>
 
-            <div class="controls">
-                <button class="control-btn" onclick="playAudio()" title="Play">▶</button>
-                <button class="control-btn" onclick="pauseAudio()" title="Pause">⏸</button>
-                <button class="control-btn" onclick="stopAudio()" title="Stop">⏹</button>
-                <button class="control-btn" onclick="enterBlackScreen()" title="Black Screen Mode">🌑</button>
-                <button class="control-btn" onclick="downloadAudio()" title="Download (Pro)">⬇️</button>
-                <button class="control-btn" onclick="startNewAudiobook()" title="New Audiobook">🆕</button>
-            </div>
+        <div class="btn-group">
+            <button class="btn" onclick="generateAudio()">⚡ Generate 432 Hz Audio</button>
+            <button class="btn btn-save" onclick="alert('Saved!')">💾 Save + Download</button>
+        </div>
+
+        <!-- USAGE DASHBOARD -->
+        <div class="usage-card">
+            <div class="usage-title">Usage Dashboard</div>
+            <div class="usage-number" id="usageNumber">50,000</div>
+            <div class="usage-label">Characters Left (Free Limit)</div>
+        </div>
+
+        <div class="premium-section">
+            <button class="premium-btn" onclick="showPremiumModal()">UPGRADE TO PREMIUM</button>
         </div>
 
         <footer>
             <p>🎵 Created with Sacred Geometry and Love Frequency 🎵</p>
-            <p style="margin-top: 0.5rem; font-size: 0.9rem;">
-                432 Hz AudioBook Creator © 2025 | Healing Through Sound
-            </p>
         </footer>
     </div>
 
-    <div class="upgrade-modal" id="upgradeModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeUpgradeModal()">×</button>
-            <h2 style="color: var(--gold);">⚡ Upgrade to Pro</h2>
-            
-            <div class="features-list">
-                <div class="feature-item">Unlimited daily conversions</div>
-                <div class="feature-item">50,000 character limit</div>
-                <div class="feature-item">Download as MP3 files</div>
-                <div class="feature-item">Premium voice options</div>
-                <div class="feature-item">Batch processing</div>
-                <div class="feature-item">Cloud storage for projects</div>
-                <div class="feature-item">Priority support</div>
-                <div class="feature-item">Commercial usage rights</div>
-            </div>
-
-            <div class="price">$9.99<span style="font-size: 1.5rem;">/month</span></div>
-            
-            <button class="btn" style="width: 100%;">
-                Subscribe Now
-            </button>
-            
-            <p style="margin-top: 1rem; color: var(--silver); font-size: 0.9rem;">
-                14-day money-back guarantee
-            </p>
-        </div>
-    </div>
-
     <script>
-        let appState = {
-            selectedFrequency: 432,
-            selectedBackgroundMusic: 'off',
-            currentUtterance: null,
-            isPlaying: false,
-            currentSpeed: 1.0,
-            musicVolume: 0.3,
-            backgroundMusicElement: null,
-            conversionsToday: 0,
-            maxConversions: 5,
-            charLimit: 5000,
-            hasProcessedAudio: false,
-            frequencyRatios: {
-                396: 0.9,
-                417: 0.95,
-                432: 1.0,
-                528: 1.2,
-                639: 1.45,
-                741: 1.68,
-                852: 1.93,
-                963: 2.18
-            }
-        };
+        let appState = { selectedFrequency: 432, charLimit: 50000, currentSpeed: 1.0 };
 
-        const BACKGROUND_MUSIC = {
-            sun: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-            rumi: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
-        };
+        const PREFERRED_VOICES = ['Lotus', 'Andrew', 'Rose', 'Ryan', 'Emma', 'Liam'];
 
-        window.onload = function() {
-            loadVoices();
-            updateCharCounter();
-            loadAppState();
-            checkDailyReset();
-            updateUsageStats();
-        };
+        let voicesLoaded = false;
 
         function loadVoices() {
-            const voiceSelect = document.getElementById('voiceSelect');
+            const select = document.getElementById('voiceSelect');
             
             function populateVoices() {
                 const voices = speechSynthesis.getVoices();
-                voiceSelect.innerHTML = '';
                 
-                voices.forEach((voice, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = `${voice.name} (${voice.lang})`;
-                    voiceSelect.appendChild(option);
+                if (voices.length === 0) {
+                    return false;
+                }
+                
+                select.innerHTML = '';
+                
+                const sortedVoices = voices.sort((a, b) => {
+                    const aIndex = PREFERRED_VOICES.findIndex(pv => a.name.includes(pv));
+                    const bIndex = PREFERRED_VOICES.findIndex(pv => b.name.includes(pv));
+                    
+                    if (aIndex === -1 && bIndex === -1) return 0;
+                    if (aIndex === -1) return 1;
+                    if (bIndex === -1) return -1;
+                    return aIndex - bIndex;
                 });
                 
-                if (voices.length > 0) {
-                    const preferredVoice = voices.findIndex(v => v.lang.includes('en') && v.name.includes('Google'));
-                    if (preferredVoice !== -1) {
-                        voiceSelect.value = preferredVoice;
-                    }
+                sortedVoices.forEach((v, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = v.name;
+                    select.appendChild(opt);
+                });
+                
+                if (sortedVoices.length > 0) {
+                    select.value = 0;
+                    voicesLoaded = true;
+                    return true;
                 }
+                
+                return false;
             }
             
-            populateVoices();
+            if (populateVoices()) {
+                return;
+            }
+            
             if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = populateVoices;
+                speechSynthesis.onvoiceschanged = function() {
+                    if (!voicesLoaded) {
+                        populateVoices();
+                    }
+                };
             }
+            
+            let attempts = 0;
+            const maxAttempts = 10;
+            const retryInterval = setInterval(() => {
+                attempts++;
+                if (populateVoices() || attempts >= maxAttempts) {
+                    clearInterval(retryInterval);
+                }
+            }, 100);
         }
 
-        function selectFrequency(freq) {
-            appState.selectedFrequency = freq;
-            
-            document.querySelectorAll('.freq-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
-            
-            document.getElementById('currentFreq').textContent = freq + ' Hz';
-            document.getElementById('blackScreenFreq').textContent = freq + ' Hz';
+        window.addEventListener('load', function() {
+            loadVoices();
+            // Extra trigger for mobile
+            setTimeout(loadVoices, 500);
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadVoices();
+        });
+
+        // Additional triggers for mobile apps
+        if ('speechSynthesis' in window) {
+            speechSynthesis.addEventListener('voiceschanged', loadVoices);
         }
 
-        function selectBackgroundMusic(music) {
-            appState.selectedBackgroundMusic = music;
-            
-            document.querySelectorAll('.music-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
-            
-            const volumeControl = document.getElementById('volumeControl');
-            if (music === 'off') {
-                volumeControl.classList.remove('active');
-                stopBackgroundMusic();
+        // Force voice loading on first interaction
+        document.addEventListener('click', function() {
+            if (!voicesLoaded) {
+                loadVoices();
+            }
+        }, { once: true });
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('textInput').value = e.target.result;
+                    updateCharCounter();
+                };
+                reader.readAsText(file);
             } else {
-                volumeControl.classList.add('active');
-            }
-        }
-
-        function updateVolume(value) {
-            appState.musicVolume = value / 100;
-            document.getElementById('volumeValue').textContent = value;
-            
-            if (appState.backgroundMusicElement) {
-                appState.backgroundMusicElement.volume = appState.musicVolume;
-            }
-        }
-
-        function playBackgroundMusic() {
-            if (appState.selectedBackgroundMusic === 'off') return;
-            
-            stopBackgroundMusic();
-            
-            const musicUrl = BACKGROUND_MUSIC[appState.selectedBackgroundMusic];
-            if (!musicUrl) return;
-            
-            appState.backgroundMusicElement = new Audio(musicUrl);
-            appState.backgroundMusicElement.volume = appState.musicVolume;
-            appState.backgroundMusicElement.loop = true;
-            appState.backgroundMusicElement.play().catch(err => {
-                console.log('Background music autoplay prevented:', err);
-            });
-        }
-
-        function stopBackgroundMusic() {
-            if (appState.backgroundMusicElement) {
-                appState.backgroundMusicElement.pause();
-                appState.backgroundMusicElement.currentTime = 0;
-                appState.backgroundMusicElement = null;
-            }
-        }
-
-        function setSpeed(speed) {
-            appState.currentSpeed = speed;
-            
-            document.querySelectorAll('.speed-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-            
-            if (appState.currentUtterance) {
-                appState.currentUtterance.rate = speed;
+                alert('⚠️ Please upload a .txt file');
             }
         }
 
         function updateCharCounter() {
             const text = document.getElementById('textInput').value;
-            const counter = document.getElementById('charCounter');
-            const length = text.length;
+            document.getElementById('charCounter').textContent = `${text.length.toLocaleString()} / 50,000 characters`;
             
-            counter.textContent = `${length.toLocaleString()} / ${appState.charLimit.toLocaleString()} characters`;
-            
-            counter.classList.remove('warning', 'limit');
-            if (length > appState.charLimit * 0.9) {
-                counter.classList.add('warning');
-            }
-            if (length > appState.charLimit) {
-                counter.classList.add('limit');
-            }
+            // Update usage dashboard
+            const remaining = 50000 - text.length;
+            document.getElementById('usageNumber').textContent = remaining.toLocaleString();
         }
 
-        function animateWaveform(isActive) {
-            const waveBars = document.querySelectorAll('.wave-bar');
-            waveBars.forEach(bar => {
-                if (isActive) {
-                    bar.style.animationPlayState = 'running';
-                } else {
-                    bar.style.animationPlayState = 'paused';
-                    bar.style.height = '20px';
-                }
-            });
+        function selectFrequency(freq, btn) {
+            appState.selectedFrequency = freq;
+            document.querySelectorAll('.freq-option').forEach(opt => opt.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function selectBackgroundMusic(music, btn) {
+            document.querySelectorAll('.music-option').forEach(opt => opt.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function setSpeed(speed, btn) {
+            appState.currentSpeed = speed;
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
 
         function generateAudio() {
             const text = document.getElementById('textInput').value.trim();
+            if (!text) { alert('⚠️ Please enter text first!'); return; }
+            if (text.length > 50000) { alert('⚠️ Text exceeds 50,000 character limit!'); return; }
             
-            if (!text) {
-                alert('⚠️ Please enter some text first!');
-                return;
-            }
-            
-            if (text.length > appState.charLimit) {
-                alert(`⚠️ Text exceeds character limit!\n\nFree tier: ${appState.charLimit.toLocaleString()} characters\nYour text: ${text.length.toLocaleString()} characters\n\nUpgrade to Pro for 50,000 character limit!`);
-                return;
-            }
-            
-            if (appState.conversionsToday >= appState.maxConversions) {
-                alert(`⚠️ Daily conversion limit reached!\n\nFree tier: ${appState.maxConversions} conversions per day\nYou've used: ${appState.conversionsToday}\n\nUpgrade to Pro for unlimited conversions!`);
-                return;
+            if (!voicesLoaded) {
+                loadVoices();
             }
             
             const voiceSelect = document.getElementById('voiceSelect');
             const voices = speechSynthesis.getVoices();
             const selectedVoice = voices[voiceSelect.value];
             
-            if (!selectedVoice) {
-                alert('⚠️ Please select a voice!');
-                return;
-            }
-            
-            appState.conversionsToday++;
-            saveAppState();
-            updateUsageStats();
-            
-            document.getElementById('audioPlayer').classList.add('active');
-            
-            const words = text.split(/\s+/).length;
-            document.getElementById('wordCount').textContent = words.toLocaleString();
-            
-            setTimeout(() => {
-                const utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance(text);
+            if (selectedVoice) {
                 utterance.voice = selectedVoice;
-                utterance.rate = appState.currentSpeed;
-                utterance.pitch = 1.0;
-                
-                appState.currentUtterance = utterance;
-                
-                setTimeout(() => {
-                    const wordsPerMinute = 150 * appState.currentSpeed;
-                    const words = text.split(/\s+/).length;
-                    const minutes = words / wordsPerMinute;
-                    const mins = Math.floor(minutes);
-                    const secs = Math.floor((minutes - mins) * 60);
-                    document.getElementById('audioDuration').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-                    
-                    appState.hasProcessedAudio = true;
-                    
-                    playAudio();
-                }, 300);
-            }, 1500);
-        }
-
-        function playAudio() {
-            if (appState.currentUtterance) {
-                speechSynthesis.cancel();
-                
-                if (appState.selectedBackgroundMusic !== 'off') {
-                    playBackgroundMusic();
-                }
-                
-                setTimeout(() => {
-                    const targetFrequency = appState.selectedFrequency;
-                    const pitchShiftRatio = appState.frequencyRatios[targetFrequency] || 1.0;
-                    
-                    const currentSpeed = appState.currentUtterance.rate;
-                    const currentPitch = appState.currentUtterance.pitch;
-                    
-                    const adjustedUtterance = new SpeechSynthesisUtterance(appState.currentUtterance.text);
-                    adjustedUtterance.voice = appState.currentUtterance.voice;
-                    adjustedUtterance.rate = currentSpeed;
-                    adjustedUtterance.pitch = currentPitch * pitchShiftRatio;
-                    
-                    speechSynthesis.speak(adjustedUtterance);
-                    appState.isPlaying = true;
-                    
-                    showFrequencyIndicator();
-                    
-                    const waveInterval = setInterval(() => {
-                        if (appState.isPlaying) {
-                            animateWaveform(true);
-                        } else {
-                            clearInterval(waveInterval);
-                            animateWaveform(false);
-                        }
-                    }, 100);
-                    
-                    adjustedUtterance.onend = () => {
-                        appState.isPlaying = false;
-                        animateWaveform(false);
-                        hideFrequencyIndicator();
-                        if (appState.selectedBackgroundMusic !== 'off') {
-                            stopBackgroundMusic();
-                        }
-                    };
-                }, 100);
             }
+            utterance.rate = appState.currentSpeed;
+            speechSynthesis.speak(utterance);
+            alert('🎧 Generating 432 Hz Audio...');
         }
 
-        function showFrequencyIndicator() {
-            const indicator = document.getElementById('currentFreq');
-            if (indicator) {
-                indicator.style.animation = 'pulse 1s ease-in-out infinite';
-            }
-        }
-
-        function hideFrequencyIndicator() {
-            const indicator = document.getElementById('currentFreq');
-            if (indicator) {
-                indicator.style.animation = 'none';
-            }
-        }
-
-        function pauseAudio() {
-            if (speechSynthesis.speaking) {
-                speechSynthesis.pause();
-                appState.isPlaying = false;
-                animateWaveform(false);
-                if (appState.backgroundMusicElement) {
-                    appState.backgroundMusicElement.pause();
-                }
-            }
-        }
-
-        function stopAudio() {
-            speechSynthesis.cancel();
-            appState.isPlaying = false;
-            animateWaveform(false);
-            stopBackgroundMusic();
-        }
-
-        function downloadAudio() {
-            alert(`⚡ DOWNLOAD FEATURE\n\nNote: The browser's Web Speech API doesn't support direct audio file export.\n\nTo enable MP3 downloads, we need to integrate with a cloud TTS service like:\n\n• ElevenLabs API (high quality)\n• Google Cloud TTS\n• Amazon Polly\n\nThis will be added in the next version!\n\nFor now, you can:\n✅ Play and listen to the audio\n✅ Use screen recording to capture it\n✅ Wait for the cloud TTS integration`);
-        }
-
-        function saveProject() {
-            const text = document.getElementById('textInput').value.trim();
-            if (!text) {
-                alert('Nothing to save!');
-                return;
-            }
-            
-            const projectName = prompt('Enter project name:');
-            if (!projectName) return;
-            
-            const project = {
-                name: projectName,
-                text: text,
-                frequency: appState.selectedFrequency,
-                date: new Date().toISOString()
-            };
-            
-            let projects = JSON.parse(localStorage.getItem('432hz-projects') || '[]');
-            projects.push(project);
-            localStorage.setItem('432hz-projects', JSON.stringify(projects));
-            
-            alert('⚡ Project saved successfully!');
-        }
-
-        function showUpgradeModal() {
-            document.getElementById('upgradeModal').classList.add('active');
-        }
-
-        function closeUpgradeModal() {
-            document.getElementById('upgradeModal').classList.remove('active');
-        }
-
-        function updateUsageStats() {
-            document.getElementById('conversionsUsed').textContent = appState.conversionsToday;
-            document.getElementById('conversionsRemaining').textContent = 
-                Math.max(0, appState.maxConversions - appState.conversionsToday);
-            document.getElementById('charLimit').textContent = 
-                appState.charLimit.toLocaleString();
-        }
-
-        function checkDailyReset() {
-            const lastReset = localStorage.getItem('lastReset');
-            const today = new Date().toDateString();
-            
-            if (lastReset !== today) {
-                appState.conversionsToday = 0;
-                localStorage.setItem('lastReset', today);
-                updateUsageStats();
-                saveAppState();
-            }
-        }
-
-        function saveAppState() {
-            localStorage.setItem('appState', JSON.stringify(appState));
-        }
-
-        function loadAppState() {
-            const saved = localStorage.getItem('appState');
-            if (saved) {
-                const savedState = JSON.parse(saved);
-                appState = {...appState, ...savedState};
-            }
-            updateUsageStats();
-        }
-
-        document.getElementById('upgradeModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeUpgradeModal();
-            }
-        });
-
-        function enterBlackScreen() {
-            document.getElementById('blackScreenOverlay').classList.add('active');
-            
-            if (!appState.isPlaying && appState.currentUtterance) {
-                playAudio();
-            }
-            
-            const elem = document.getElementById('blackScreenOverlay');
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            }
-            
-            if ('wakeLock' in navigator) {
-                navigator.wakeLock.request('screen').catch(err => {
-                    console.log('Wake Lock not available:', err);
-                });
-            }
-        }
-
-        function exitBlackScreen() {
-            document.getElementById('blackScreenOverlay').classList.remove('active');
-            
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        }
-
-        function startNewAudiobook() {
-            stopAudio();
-            document.getElementById('audioPlayer').classList.remove('active');
-            appState.currentUtterance = null;
-            appState.isPlaying = false;
-            document.getElementById('textInput').value = '';
-            updateCharCounter();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                exitBlackScreen();
-            }
-        });
+        function showPremiumModal() { document.getElementById('premiumModal').classList.add('active'); }
+        function closePremiumModal() { document.getElementById('premiumModal').classList.remove('active'); }
     </script>
 </body>
 </html>
