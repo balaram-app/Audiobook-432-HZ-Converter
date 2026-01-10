@@ -442,16 +442,18 @@
             box-shadow: 0 8px 30px rgba(32, 178, 170, 0.5);
         }
 
-        /* SAVE BUTTON - WHITE BOLD TEXT */
+        /* SAVE BUTTON - DEEP DARK GREEN */
         .btn-save {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
+            background: linear-gradient(135deg, #228B22, #006400);
+            border: 3px solid #228B22;
             color: #FFFFFF;
             font-weight: 900;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(34, 139, 34, 0.4);
         }
 
         .btn-save:hover {
-            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 8px 30px rgba(34, 139, 34, 0.6);
         }
 
         .speed-card {
@@ -526,9 +528,9 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 1.5rem;
             font-weight: 900;
-            color: #FFD700;
+            color: #FFFFFF;
             margin: 0.5rem 0;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
         }
 
         .usage-label {
@@ -744,7 +746,11 @@
     <script>
         let appState = { selectedFrequency: 432, charLimit: 50000, currentSpeed: 1.0 };
 
-        const PREFERRED_VOICES = ['Lotus', 'Andrew', 'Rose', 'Ryan', 'Emma', 'Liam'];
+        const PREFERRED_VOICES = [
+            'Samantha', 'Alex', 'Victoria', 'Allison', 'Susan', 'Ava', 'Tom', 'Karen',
+            'Clara', 'Emma', 'Ryan', 'Andrew', 'Liam', 'Zoe', 'Nicky', 'Fiona',
+            'Daniel', 'Moira', 'Tessa', 'Aaron', 'Fred', 'Rishi', 'Eddy'
+        ];
 
         let voicesLoaded = false;
 
@@ -758,9 +764,25 @@
                     return false;
                 }
                 
+                // Filter for high-quality voices only
+                const qualityVoices = voices.filter(voice => {
+                    const name = voice.name.toLowerCase();
+                    // Keep only US English voices and high-quality ones
+                    return (voice.lang.includes('en-US') || voice.lang.includes('en_US')) &&
+                           !name.includes('compact') &&
+                           !name.includes('low') &&
+                           !name.includes('poor');
+                });
+                
+                if (qualityVoices.length === 0) {
+                    select.innerHTML = '<option>No premium voices available</option>';
+                    return false;
+                }
+                
                 select.innerHTML = '';
                 
-                const sortedVoices = voices.sort((a, b) => {
+                // Sort by preferred voices first
+                const sortedVoices = qualityVoices.sort((a, b) => {
                     const aIndex = PREFERRED_VOICES.findIndex(pv => a.name.includes(pv));
                     const bIndex = PREFERRED_VOICES.findIndex(pv => b.name.includes(pv));
                     
@@ -773,7 +795,9 @@
                 sortedVoices.forEach((v, i) => {
                     const opt = document.createElement('option');
                     opt.value = i;
-                    opt.textContent = v.name;
+                    // Clean voice name - remove extra info
+                    const cleanName = v.name.split('(')[0].trim();
+                    opt.textContent = cleanName;
                     select.appendChild(opt);
                 });
                 
