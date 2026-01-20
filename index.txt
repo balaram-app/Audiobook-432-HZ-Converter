@@ -662,6 +662,16 @@
                 </div>
                 <input type="file" id="fileInput" accept=".txt" style="display: none;" onchange="handleFileUpload(event)">
             </div>
+
+            <label class="voice-label">Select Voice</label>
+            <select id="voiceSelect">
+                <option value="en">English (US) - Female</option>
+                <option value="en-us">English (US) - Male</option>
+                <option value="en-uk">English (UK) - Female</option>
+                <option value="en-gb">English (UK) - Male</option>
+                <option value="en-au">English (Australia) - Female</option>
+                <option value="en-in">English (India) - Female</option>
+            </select>
         </div>
 
         <div class="frequency-card">
@@ -813,8 +823,12 @@
             btn.disabled = true;
             
             try {
-                // IMPORTANT: Replace with your actual backend URL after deployment
+                // Backend API URL
                 const BACKEND_URL = 'https://four32hz-audiobook-backend.onrender.com';
+                
+                // Get selected voice
+                const voiceSelect = document.getElementById('voiceSelect');
+                const selectedVoice = voiceSelect.value;
                 
                 const response = await fetch(`${BACKEND_URL}/generate`, {
                     method: 'POST',
@@ -824,7 +838,7 @@
                     body: JSON.stringify({
                         text: text,
                         frequency: appState.selectedFrequency,
-                        voice: 'en',
+                        voice: selectedVoice,
                         background_music: appState.selectedMusic || 'off',
                         speed: appState.currentSpeed
                     })
