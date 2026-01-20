@@ -724,7 +724,7 @@
 
         <div class="btn-group">
             <button class="btn" onclick="generateAudio()">⚡ Generate 432 Hz Audio</button>
-            <button class="btn btn-save" onclick="alert('Saved!')">💾 Save + Download</button>
+            <button class="btn btn-save" onclick="saveAndDownload()">💾 Save + Download</button>
         </div>
 
         <!-- USAGE DASHBOARD -->
@@ -744,7 +744,14 @@
     </div>
 
     <script>
-        let appState = { selectedFrequency: 432, charLimit: 50000, currentSpeed: 1.0 };
+        let appState = { 
+            selectedFrequency: 432, 
+            charLimit: 50000, 
+            currentSpeed: 1.0,
+            selectedMusic: 'off',
+            sessionId: null,
+            downloadUrl: null
+        };
 
         const PREFERRED_VOICES = [
             'Samantha', 'Alex', 'Victoria', 'Allison', 'Susan', 'Ava', 'Tom', 'Karen',
@@ -884,8 +891,76 @@
         }
 
         function selectBackgroundMusic(music, btn) {
+            appState.selectedMusic = music;
             document.querySelectorAll('.music-option').forEach(opt => opt.classList.remove('selected'));
             btn.classList.add('selected');
+        }
+
+        async function generateAudio() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) { 
+                alert('⚠️ Please enter text first!'); 
+                return; 
+            }
+            if (text.length > 50000) { 
+                alert('⚠️ Text exceeds 50,000 character limit!'); 
+                return; 
+            }
+            
+            // Show loading message
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '⏳ Generating...';
+            btn.disabled = true;
+            
+            try {
+                // IMPORTANT: Replace with your actual backend URL after deployment
+                const BACKEND_URL = 'https://four32hz-audiobook-backend.onrender.com';
+                
+                const response = await fetch(`${BACKEND_URL}/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        frequency: appState.selectedFrequency,
+                        voice: 'en',
+                        background_music: appState.selectedMusic || 'off',
+                        speed: appState.currentSpeed
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ ${data.message}\n\nClick "Save + Download" to get your file!`);
+                    // Store session ID for download
+                    appState.sessionId = data.session_id;
+                    appState.downloadUrl = `${BACKEND_URL}${data.download_url}`;
+                } else {
+                    alert('❌ Generation failed: ' + (data.error || 'Unknown error'));
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Connection error. Make sure the backend server is running!\n\n' + 
+                      'Error: ' + error.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function saveAndDownload() {
+            if (!appState.sessionId || !appState.downloadUrl) {
+                alert('⚠️ Please generate audio first!');
+                return;
+            }
+            
+            // Download the file
+            window.location.href = appState.downloadUrl;
+            alert('📥 Downloading your 432 Hz audiobook!');
         }
 
         function setSpeed(speed, btn) {
