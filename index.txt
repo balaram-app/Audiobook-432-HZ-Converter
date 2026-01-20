@@ -662,9 +662,6 @@
                 </div>
                 <input type="file" id="fileInput" accept=".txt" style="display: none;" onchange="handleFileUpload(event)">
             </div>
-
-            <label class="voice-label">Select Voice</label>
-            <select id="voiceSelect"><option>Loading voices...</option></select>
         </div>
 
         <div class="frequency-card">
@@ -753,113 +750,15 @@
             downloadUrl: null
         };
 
-        const PREFERRED_VOICES = [
-            'Samantha', 'Alex', 'Victoria', 'Allison', 'Susan', 'Ava', 'Tom', 'Karen',
-            'Clara', 'Emma', 'Ryan', 'Andrew', 'Liam', 'Zoe', 'Nicky', 'Fiona',
-            'Daniel', 'Moira', 'Tessa', 'Aaron', 'Fred', 'Rishi', 'Eddy'
-        ];
-
-        let voicesLoaded = false;
-
-        function loadVoices() {
-            const select = document.getElementById('voiceSelect');
-            
-            function populateVoices() {
-                const voices = speechSynthesis.getVoices();
-                
-                if (voices.length === 0) {
-                    return false;
-                }
-                
-                // Filter for high-quality voices only
-                const qualityVoices = voices.filter(voice => {
-                    const name = voice.name.toLowerCase();
-                    // Keep only US English voices and high-quality ones
-                    return (voice.lang.includes('en-US') || voice.lang.includes('en_US')) &&
-                           !name.includes('compact') &&
-                           !name.includes('low') &&
-                           !name.includes('poor');
-                });
-                
-                if (qualityVoices.length === 0) {
-                    select.innerHTML = '<option>No premium voices available</option>';
-                    return false;
-                }
-                
-                select.innerHTML = '';
-                
-                // Sort by preferred voices first
-                const sortedVoices = qualityVoices.sort((a, b) => {
-                    const aIndex = PREFERRED_VOICES.findIndex(pv => a.name.includes(pv));
-                    const bIndex = PREFERRED_VOICES.findIndex(pv => b.name.includes(pv));
-                    
-                    if (aIndex === -1 && bIndex === -1) return 0;
-                    if (aIndex === -1) return 1;
-                    if (bIndex === -1) return -1;
-                    return aIndex - bIndex;
-                });
-                
-                sortedVoices.forEach((v, i) => {
-                    const opt = document.createElement('option');
-                    opt.value = i;
-                    // Clean voice name - remove extra info
-                    const cleanName = v.name.split('(')[0].trim();
-                    opt.textContent = cleanName;
-                    select.appendChild(opt);
-                });
-                
-                if (sortedVoices.length > 0) {
-                    select.value = 0;
-                    voicesLoaded = true;
-                    return true;
-                }
-                
-                return false;
-            }
-            
-            if (populateVoices()) {
-                return;
-            }
-            
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = function() {
-                    if (!voicesLoaded) {
-                        populateVoices();
-                    }
-                };
-            }
-            
-            let attempts = 0;
-            const maxAttempts = 10;
-            const retryInterval = setInterval(() => {
-                attempts++;
-                if (populateVoices() || attempts >= maxAttempts) {
-                    clearInterval(retryInterval);
-                }
-            }, 100);
-        }
+        // Backend handles voice generation - no client-side voice selection needed
 
         window.addEventListener('load', function() {
-            loadVoices();
-            // Extra trigger for mobile
-            setTimeout(loadVoices, 500);
+            updateCharCounter();
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            loadVoices();
+            updateCharCounter();
         });
-
-        // Additional triggers for mobile apps
-        if ('speechSynthesis' in window) {
-            speechSynthesis.addEventListener('voiceschanged', loadVoices);
-        }
-
-        // Force voice loading on first interaction
-        document.addEventListener('click', function() {
-            if (!voicesLoaded) {
-                loadVoices();
-            }
-        }, { once: true });
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
