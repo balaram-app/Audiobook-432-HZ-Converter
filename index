@@ -8,9 +8,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="version" content="8.0">
+    <meta name="version" content="8.1-fixed">
     
-    <title>432 Hz AudioBook Creator v8.0</title>
+    <title>432 Hz AudioBook Creator v8.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -437,9 +437,14 @@
             transition: all 0.3s ease;
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(32, 178, 170, 0.5);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         /* SAVE BUTTON - DEEP DARK GREEN */
@@ -452,7 +457,7 @@
             box-shadow: 0 0 20px rgba(34, 139, 34, 0.4);
         }
 
-        .btn-save:hover {
+        .btn-save:hover:not(:disabled) {
             box-shadow: 0 8px 30px rgba(34, 139, 34, 0.6);
         }
 
@@ -729,8 +734,8 @@
         </div>
 
         <div class="btn-group">
-            <button class="btn" onclick="generateAudio()">⚡ Generate 432 Hz Audio</button>
-            <button class="btn btn-save" onclick="saveAndDownload()">💾 Save + Download</button>
+            <button class="btn" id="generateBtn" onclick="generateAudio()">⚡ Generate 432 Hz Audio</button>
+            <button class="btn btn-save" id="downloadBtn" onclick="saveAndDownload()">💾 Save + Download</button>
         </div>
 
         <!-- USAGE DASHBOARD -->
@@ -750,6 +755,7 @@
     </div>
 
     <script>
+        // ===== APP STATE =====
         let appState = { 
             selectedFrequency: 432, 
             charLimit: 50000, 
@@ -759,16 +765,17 @@
             downloadUrl: null
         };
 
-        // Backend handles voice generation - no client-side voice selection needed
+        // Backend URL - UPDATE THIS IF YOUR RENDER URL IS DIFFERENT
+        const BACKEND_URL = 'https://four32hz-audiobook-backend.onrender.com';
 
+        // ===== INITIALIZATION =====
         window.addEventListener('load', function() {
             updateCharCounter();
+            console.log('432 Hz AudioBook Creator loaded');
+            console.log('Backend URL:', BACKEND_URL);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCharCounter();
-        });
-
+        // ===== FILE UPLOAD =====
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (file && file.type === 'text/plain') {
@@ -783,29 +790,46 @@
             }
         }
 
+        // ===== CHARACTER COUNTER =====
         function updateCharCounter() {
             const text = document.getElementById('textInput').value;
-            document.getElementById('charCounter').textContent = `${text.length.toLocaleString()} / 50,000 characters`;
+            const charCount = text.length;
+            document.getElementById('charCounter').textContent = `${charCount.toLocaleString()} / 50,000 characters`;
             
             // Update usage dashboard
-            const remaining = 50000 - text.length;
+            const remaining = 50000 - charCount;
             document.getElementById('usageNumber').textContent = remaining.toLocaleString();
         }
 
+        // ===== FREQUENCY SELECTION =====
         function selectFrequency(freq, btn) {
             appState.selectedFrequency = freq;
             document.querySelectorAll('.freq-option').forEach(opt => opt.classList.remove('selected'));
             btn.classList.add('selected');
+            console.log('Selected frequency:', freq);
         }
 
+        // ===== BACKGROUND MUSIC SELECTION =====
         function selectBackgroundMusic(music, btn) {
             appState.selectedMusic = music;
             document.querySelectorAll('.music-option').forEach(opt => opt.classList.remove('selected'));
             btn.classList.add('selected');
+            console.log('Selected music:', music);
         }
 
+        // ===== SPEECH SPEED SELECTION =====
+        function setSpeed(speed, btn) {
+            appState.currentSpeed = speed;
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            console.log('Selected speed:', speed);
+        }
+
+        // ===== GENERATE AUDIO (MAIN FUNCTION) =====
         async function generateAudio() {
             const text = document.getElementById('textInput').value.trim();
+            
+            // Validation
             if (!text) { 
                 alert('⚠️ Please enter text first!'); 
                 return; 
@@ -815,20 +839,25 @@
                 return; 
             }
             
-            // Show loading message
-            const btn = event.target;
+            // Get button and show loading state
+            const btn = document.getElementById('generateBtn');
             const originalText = btn.textContent;
             btn.textContent = '⏳ Generating...';
             btn.disabled = true;
             
             try {
-                // Backend API URL
-                const BACKEND_URL = 'https://four32hz-audiobook-backend.onrender.com';
-                
-                // Get selected voice/accent
+                // Get selected voice
                 const voiceSelect = document.getElementById('voiceSelect');
                 const selectedVoice = voiceSelect.value;
                 
+                console.log('Sending request to backend...');
+                console.log('Text length:', text.length);
+                console.log('Frequency:', appState.selectedFrequency);
+                console.log('Voice:', selectedVoice);
+                console.log('Background music:', appState.selectedMusic);
+                console.log('Speed:', appState.currentSpeed);
+                
+                // Call backend API
                 const response = await fetch(`${BACKEND_URL}/generate`, {
                     method: 'POST',
                     headers: {
@@ -838,73 +867,64 @@
                         text: text,
                         frequency: appState.selectedFrequency,
                         voice: selectedVoice,
-                        background_music: appState.selectedMusic || 'off',
+                        background_music: appState.selectedMusic,
                         speed: appState.currentSpeed
                     })
                 });
                 
+                console.log('Response status:', response.status);
                 const data = await response.json();
+                console.log('Response data:', data);
                 
                 if (data.success) {
-                    alert(`✅ ${data.message}\n\nClick "Save + Download" to get your file!`);
-                    // Store session ID for download
+                    // Store session info for download
                     appState.sessionId = data.session_id;
                     appState.downloadUrl = `${BACKEND_URL}${data.download_url}`;
+                    
+                    alert(`✅ ${data.message}\n\nClick "Save + Download" to get your file!`);
+                    console.log('Audio generated successfully!');
+                    console.log('Download URL:', appState.downloadUrl);
                 } else {
                     alert('❌ Generation failed: ' + (data.error || 'Unknown error'));
+                    console.error('Generation failed:', data.error);
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Connection error. Make sure the backend server is running!\n\n' + 
+                alert('❌ Connection error. Please check:\n\n' + 
+                      '1. Backend server is running on Render\n' +
+                      '2. Your internet connection is stable\n' +
+                      '3. No firewall blocking the request\n\n' +
                       'Error: ' + error.message);
             } finally {
+                // Reset button
                 btn.textContent = originalText;
                 btn.disabled = false;
             }
         }
 
+        // ===== DOWNLOAD AUDIO =====
         function saveAndDownload() {
             if (!appState.sessionId || !appState.downloadUrl) {
-                alert('⚠️ Please generate audio first!');
+                alert('⚠️ Please generate audio first by clicking "Generate 432 Hz Audio"!');
                 return;
             }
+            
+            console.log('Downloading from:', appState.downloadUrl);
             
             // Download the file
             window.location.href = appState.downloadUrl;
             alert('📥 Downloading your 432 Hz audiobook!');
         }
 
-        function setSpeed(speed, btn) {
-            appState.currentSpeed = speed;
-            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        // ===== PREMIUM MODAL =====
+        function showPremiumModal() { 
+            document.getElementById('premiumModal').classList.add('active'); 
         }
-
-        function generateAudio() {
-            const text = document.getElementById('textInput').value.trim();
-            if (!text) { alert('⚠️ Please enter text first!'); return; }
-            if (text.length > 50000) { alert('⚠️ Text exceeds 50,000 character limit!'); return; }
-            
-            if (!voicesLoaded) {
-                loadVoices();
-            }
-            
-            const voiceSelect = document.getElementById('voiceSelect');
-            const voices = speechSynthesis.getVoices();
-            const selectedVoice = voices[voiceSelect.value];
-            
-            const utterance = new SpeechSynthesisUtterance(text);
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
-            utterance.rate = appState.currentSpeed;
-            speechSynthesis.speak(utterance);
-            alert('🎧 Generating 432 Hz Audio...');
+        
+        function closePremiumModal() { 
+            document.getElementById('premiumModal').classList.remove('active'); 
         }
-
-        function showPremiumModal() { document.getElementById('premiumModal').classList.add('active'); }
-        function closePremiumModal() { document.getElementById('premiumModal').classList.remove('active'); }
     </script>
 </body>
 </html>
