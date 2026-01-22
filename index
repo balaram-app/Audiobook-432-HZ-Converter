@@ -8,9 +8,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="version" content="8.1-fixed">
+    <meta name="version" content="9.0">
     
-    <title>432 Hz AudioBook Creator v8.1</title>
+    <title>432 Hz AudioBook Creator v9.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -437,13 +437,13 @@
             transition: all 0.3s ease;
         }
 
-        .btn:hover:not(:disabled) {
+        .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(32, 178, 170, 0.5);
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
@@ -457,7 +457,7 @@
             box-shadow: 0 0 20px rgba(34, 139, 34, 0.4);
         }
 
-        .btn-save:hover:not(:disabled) {
+        .btn-save:hover {
             box-shadow: 0 8px 30px rgba(34, 139, 34, 0.6);
         }
 
@@ -602,6 +602,35 @@
 
         footer { text-align: center; padding: 2rem 0; color: rgba(255,255,255,0.7); }
 
+        /* STATUS MESSAGE */
+        .status-message {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid var(--turquoise);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            color: var(--turquoise);
+            font-family: 'Orbitron', sans-serif;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-message.error {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: #FF6B6B;
+            color: #FF6B6B;
+        }
+
+        .status-message.success {
+            background: rgba(0, 255, 127, 0.1);
+            border-color: #00FF7F;
+            color: #00FF7F;
+        }
+
         @media (max-width: 768px) {
             .logo { font-size: 2.2rem; }
             .tagline { font-size: 2rem; }
@@ -670,11 +699,14 @@
 
             <label class="voice-label">Select Voice & Accent</label>
             <select id="voiceSelect">
-                <option value="en">🇺🇸 English (US) - Standard</option>
-                <option value="en-uk">🇬🇧 English (UK) - British</option>
-                <option value="en-au">🇦🇺 English (Australia) - Australian</option>
-                <option value="en-in">🇮🇳 English (India) - Indian</option>
-                <option value="en-ca">🇨🇦 English (Canada) - Canadian</option>
+                <option value="en-US-Neural2-J">🇺🇸 English (US) - Male (Neural)</option>
+                <option value="en-US-Neural2-F">🇺🇸 English (US) - Female (Neural)</option>
+                <option value="en-GB-Neural2-B">🇬🇧 English (UK) - Male (Neural)</option>
+                <option value="en-GB-Neural2-A">🇬🇧 English (UK) - Female (Neural)</option>
+                <option value="en-AU-Neural2-B">🇦🇺 English (AU) - Male (Neural)</option>
+                <option value="en-AU-Neural2-A">🇦🇺 English (AU) - Female (Neural)</option>
+                <option value="en-IN-Neural2-B">🇮🇳 English (IN) - Male (Neural)</option>
+                <option value="en-IN-Neural2-A">🇮🇳 English (IN) - Female (Neural)</option>
             </select>
         </div>
 
@@ -733,9 +765,12 @@
             </div>
         </div>
 
+        <!-- STATUS MESSAGE -->
+        <div class="status-message" id="statusMessage"></div>
+
         <div class="btn-group">
             <button class="btn" id="generateBtn" onclick="generateAudio()">⚡ Generate 432 Hz Audio</button>
-            <button class="btn btn-save" id="downloadBtn" onclick="saveAndDownload()">💾 Save + Download</button>
+            <button class="btn btn-save" id="downloadBtn" onclick="saveAndDownload()" disabled>💾 Save + Download</button>
         </div>
 
         <!-- USAGE DASHBOARD -->
@@ -755,27 +790,33 @@
     </div>
 
     <script>
-        // ===== APP STATE =====
+        // ========================================
+        // APP STATE
+        // ========================================
         let appState = { 
             selectedFrequency: 432, 
             charLimit: 50000, 
             currentSpeed: 1.0,
             selectedMusic: 'off',
             sessionId: null,
-            downloadUrl: null
+            downloadUrl: null,
+            selectedVoice: 'en-US-Neural2-J'
         };
 
-        // Backend URL - UPDATE THIS IF YOUR RENDER URL IS DIFFERENT
+        // Backend URL - CHANGE THIS to your deployed backend
         const BACKEND_URL = 'https://four32hz-audiobook-backend.onrender.com';
 
-        // ===== INITIALIZATION =====
+        // ========================================
+        // INITIALIZATION
+        // ========================================
         window.addEventListener('load', function() {
             updateCharCounter();
-            console.log('432 Hz AudioBook Creator loaded');
-            console.log('Backend URL:', BACKEND_URL);
+            showStatus('Ready to create healing frequencies! 🎵', 'success');
         });
 
-        // ===== FILE UPLOAD =====
+        // ========================================
+        // FILE UPLOAD
+        // ========================================
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (file && file.type === 'text/plain') {
@@ -783,79 +824,123 @@
                 reader.onload = function(e) {
                     document.getElementById('textInput').value = e.target.result;
                     updateCharCounter();
+                    showStatus('File uploaded successfully! ✓', 'success');
                 };
                 reader.readAsText(file);
             } else {
-                alert('⚠️ Please upload a .txt file');
+                showStatus('Please upload a .txt file', 'error');
             }
         }
 
-        // ===== CHARACTER COUNTER =====
+        // ========================================
+        // CHARACTER COUNTER
+        // ========================================
         function updateCharCounter() {
             const text = document.getElementById('textInput').value;
             const charCount = text.length;
             document.getElementById('charCounter').textContent = `${charCount.toLocaleString()} / 50,000 characters`;
             
             // Update usage dashboard
-            const remaining = 50000 - charCount;
+            const remaining = Math.max(0, 50000 - charCount);
             document.getElementById('usageNumber').textContent = remaining.toLocaleString();
+            
+            // Disable generate button if over limit
+            const generateBtn = document.getElementById('generateBtn');
+            if (charCount > 50000) {
+                generateBtn.disabled = true;
+                showStatus('Text exceeds 50,000 character limit!', 'error');
+            } else {
+                generateBtn.disabled = false;
+            }
         }
 
-        // ===== FREQUENCY SELECTION =====
+        // ========================================
+        // FREQUENCY SELECTION
+        // ========================================
         function selectFrequency(freq, btn) {
             appState.selectedFrequency = freq;
             document.querySelectorAll('.freq-option').forEach(opt => opt.classList.remove('selected'));
             btn.classList.add('selected');
-            console.log('Selected frequency:', freq);
+            showStatus(`Frequency set to ${freq} Hz`, 'success');
         }
 
-        // ===== BACKGROUND MUSIC SELECTION =====
+        // ========================================
+        // BACKGROUND MUSIC SELECTION
+        // ========================================
         function selectBackgroundMusic(music, btn) {
             appState.selectedMusic = music;
             document.querySelectorAll('.music-option').forEach(opt => opt.classList.remove('selected'));
             btn.classList.add('selected');
-            console.log('Selected music:', music);
+            const musicName = music === 'off' ? 'No music' : music.charAt(0).toUpperCase() + music.slice(1);
+            showStatus(`Background music: ${musicName}`, 'success');
         }
 
-        // ===== SPEECH SPEED SELECTION =====
+        // ========================================
+        // SPEECH SPEED SELECTION
+        // ========================================
         function setSpeed(speed, btn) {
             appState.currentSpeed = speed;
             document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            console.log('Selected speed:', speed);
+            showStatus(`Speed set to ${speed}x`, 'success');
         }
 
-        // ===== GENERATE AUDIO (MAIN FUNCTION) =====
+        // ========================================
+        // STATUS MESSAGE DISPLAY
+        // ========================================
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status-message show ' + type;
+            
+            // Auto-hide after 5 seconds unless it's an error
+            if (type !== 'error') {
+                setTimeout(() => {
+                    statusDiv.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // ========================================
+        // GENERATE AUDIO (BACKEND API)
+        // ========================================
         async function generateAudio() {
             const text = document.getElementById('textInput').value.trim();
             
             // Validation
             if (!text) { 
-                alert('⚠️ Please enter text first!'); 
+                showStatus('Please enter text first!', 'error');
                 return; 
             }
             if (text.length > 50000) { 
-                alert('⚠️ Text exceeds 50,000 character limit!'); 
+                showStatus('Text exceeds 50,000 character limit!', 'error');
                 return; 
             }
             
-            // Get button and show loading state
-            const btn = document.getElementById('generateBtn');
-            const originalText = btn.textContent;
-            btn.textContent = '⏳ Generating...';
-            btn.disabled = true;
+            // Get UI elements
+            const generateBtn = document.getElementById('generateBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const originalText = generateBtn.textContent;
+            
+            // Show loading state
+            generateBtn.textContent = '⏳ Generating...';
+            generateBtn.disabled = true;
+            downloadBtn.disabled = true;
+            showStatus('Connecting to server... This may take 30-60 seconds.', 'info');
             
             try {
                 // Get selected voice
                 const voiceSelect = document.getElementById('voiceSelect');
-                const selectedVoice = voiceSelect.value;
+                appState.selectedVoice = voiceSelect.value;
                 
-                console.log('Sending request to backend...');
-                console.log('Text length:', text.length);
-                console.log('Frequency:', appState.selectedFrequency);
-                console.log('Voice:', selectedVoice);
-                console.log('Background music:', appState.selectedMusic);
-                console.log('Speed:', appState.currentSpeed);
+                console.log('Sending request to:', BACKEND_URL + '/generate');
+                console.log('Request data:', {
+                    text_length: text.length,
+                    frequency: appState.selectedFrequency,
+                    voice: appState.selectedVoice,
+                    background_music: appState.selectedMusic,
+                    speed: appState.currentSpeed
+                });
                 
                 // Call backend API
                 const response = await fetch(`${BACKEND_URL}/generate`, {
@@ -866,8 +951,8 @@
                     body: JSON.stringify({
                         text: text,
                         frequency: appState.selectedFrequency,
-                        voice: selectedVoice,
-                        background_music: appState.selectedMusic,
+                        voice: appState.selectedVoice,
+                        background_music: appState.selectedMusic || 'off',
                         speed: appState.currentSpeed
                     })
                 });
@@ -877,47 +962,48 @@
                 console.log('Response data:', data);
                 
                 if (data.success) {
-                    // Store session info for download
+                    // Success!
                     appState.sessionId = data.session_id;
                     appState.downloadUrl = `${BACKEND_URL}${data.download_url}`;
                     
-                    alert(`✅ ${data.message}\n\nClick "Save + Download" to get your file!`);
-                    console.log('Audio generated successfully!');
-                    console.log('Download URL:', appState.downloadUrl);
+                    showStatus(`✅ ${data.message} - Ready to download!`, 'success');
+                    downloadBtn.disabled = false;
                 } else {
-                    alert('❌ Generation failed: ' + (data.error || 'Unknown error'));
-                    console.error('Generation failed:', data.error);
+                    showStatus('❌ Generation failed: ' + (data.error || 'Unknown error'), 'error');
+                    console.error('Backend error:', data.error);
                 }
                 
             } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Connection error. Please check:\n\n' + 
-                      '1. Backend server is running on Render\n' +
-                      '2. Your internet connection is stable\n' +
-                      '3. No firewall blocking the request\n\n' +
-                      'Error: ' + error.message);
+                console.error('Connection error:', error);
+                showStatus(
+                    '❌ Cannot connect to backend server!\n\n' + 
+                    'Make sure the backend is running at: ' + BACKEND_URL + '\n\n' +
+                    'Error: ' + error.message,
+                    'error'
+                );
             } finally {
-                // Reset button
-                btn.textContent = originalText;
-                btn.disabled = false;
+                generateBtn.textContent = originalText;
+                generateBtn.disabled = false;
             }
         }
 
-        // ===== DOWNLOAD AUDIO =====
+        // ========================================
+        // SAVE AND DOWNLOAD
+        // ========================================
         function saveAndDownload() {
             if (!appState.sessionId || !appState.downloadUrl) {
-                alert('⚠️ Please generate audio first by clicking "Generate 432 Hz Audio"!');
+                showStatus('Please generate audio first!', 'error');
                 return;
             }
             
-            console.log('Downloading from:', appState.downloadUrl);
-            
             // Download the file
+            showStatus('📥 Starting download...', 'success');
             window.location.href = appState.downloadUrl;
-            alert('📥 Downloading your 432 Hz audiobook!');
         }
 
-        // ===== PREMIUM MODAL =====
+        // ========================================
+        // PREMIUM MODAL
+        // ========================================
         function showPremiumModal() { 
             document.getElementById('premiumModal').classList.add('active'); 
         }
